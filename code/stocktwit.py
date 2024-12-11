@@ -1,6 +1,5 @@
 import requests
 import pandas as pd
-from lxml import etree
 import os
 import time
 from selenium import webdriver
@@ -13,6 +12,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import ElementClickInterceptedException
+from dotenv import load_dotenv
+from datastorage import save_to_database
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 def get_url(path):
     df = pd.read_excel(path)
@@ -49,6 +52,16 @@ def scroll(driver, fetch_interval=5, step_size=1500, pause_time=0.5):
         driver.execute_script(f"window.scrollBy(0, {step_size});")
         time.sleep(pause_time)
     time.sleep(pause_time*2)
+
+def scroll_to_bottom(driver, wait_time=5):
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    while True:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(wait_time)
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
 
 def get_comments_one_page(driver):
     comment_time = []
@@ -136,13 +149,18 @@ def write_csv(data, company, path):
     write_header = not os.path.exists(file_path) 
     data.to_csv(file_path, mode='a+', index=False, header=write_header, sep=',')
 
-def get_comments_one_stock(driver):
+def get_comments_one_stock(driver, stock, session, csv_path, max_duration=11000):
     all_information = pd.DataFrame()
     old_information = pd.DataFrame()
     time.sleep(1)
     scroll(driver, fetch_interval=2, step_size=1000, pause_time=0.5)
-    n = 0 
-    while n<1500:
+    n = 0
+    start_time = time.time()
+    while n<1400:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > max_duration:
+            print(f"Reached max duration for stock, exiting after {elapsed_time:.2f} seconds.")
+            break
         try:
             comment_time,comments,sentiments_tag,influence = get_comments_one_page(driver)
             time.sleep(1)
@@ -154,21 +172,40 @@ def get_comments_one_stock(driver):
             })
             if not old_information.empty:
                 current_information = current_information[~current_information["comments"].isin(old_information["comments"])]
-            all_information = pd.concat([all_information, current_information], ignore_index=True)
+            if not current_information.empty:
+                current_information.insert(loc=0, column='stock', value=stock)
+                all_information = pd.concat([all_information, current_information], ignore_index=True)
+                try:
+                    save_to_database(current_information, session)
+                except Exception as e:
+                    print(f"Error saving to database for stock {stock}: {e}")
+                try:
+                    write_csv(current_information, stock, csv_path)
+                except Exception as e:
+                    print(f"Error writing to CSV for stock {stock}: {e}")
             old_information = current_information
-            scroll(driver)
+            if n<5:
+                scroll(driver, fetch_interval=5, step_size=1500, pause_time=0.5)
+            elif n>10:
+                scroll(driver, fetch_interval=5, step_size=1000, pause_time=0.5)
+            else:
+                scroll_to_bottom(driver, wait_time=5)
             n += 1
             time.sleep(1)
-        except:
+        except Exception as e:
             n += 1
             time.sleep(1)
+            continue
     return all_information
 
-def get_comments_all_stock(path,account,key,csv_path):
+def get_comments_all_stock(path,account,key,session):
     url_list,stock_name = get_url(path)
+    csv_path = "./comments"
+    if not os.path.exists(csv_path):
+        os.makedirs(csv_path)
     for url, stock in zip(url_list, stock_name):
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--headless') 
+        chrome_options.add_argument("--headless")
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
         chrome_options.add_argument("--disable-gpu")
@@ -179,14 +216,12 @@ def get_comments_all_stock(path,account,key,csv_path):
         driver = webdriver.Chrome(options=chrome_options)
         try:
             driver.get(url)
+            time.sleep(5)
             log_in(driver, account, key)
-            comments = get_comments_one_stock(driver)
+            get_comments_one_stock(driver, stock, session, csv_path)
         except Exception as e:
-            print(f"Error: {e}")
-            continue
+            print(f"Error while scraping stock {stock}: {e}")
         finally:
-            comments.insert(loc=0, column='stock', value=stock)
-            write_csv(comments, stock, csv_path)
             driver.quit()
             time.sleep(5)
     return None
@@ -194,6 +229,17 @@ def get_comments_all_stock(path,account,key,csv_path):
 if __name__ == "__main__":
     account = ""
     key = ""
-    path = "Dow_Jones_Average_Index_companies.xlsx"
-    csv_path = "./comments"
-    get_comments_all_stock(path,account,key,csv_path)
+    path = "data/Dow_Jones_Average_Index_companies.xlsx"
+    load_dotenv()
+    DATABASE_USERNAME = os.getenv("DATABASE_USERNAME")
+    DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+    DATABASE_HOST = os.getenv("DATABASE_HOST")
+    DATABASE_PORT = os.getenv("DATABASE_PORT")
+    DATABASE_DATABASE = os.getenv("DATABASE_DATABASE")
+    SQLALCHEMY_DATABASE_URL = f"postgresql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_DATABASE}"
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    get_comments_all_stock(path, account, key, session)
+
+
