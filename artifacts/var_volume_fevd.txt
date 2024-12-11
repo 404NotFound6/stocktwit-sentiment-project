@@ -1,0 +1,9 @@
+Variance Decomposition (Steps=10):
+
+Step 1:
+log_volume: [1.0000, 0.0000]
+daily_weighted_sentiment: [0.9998, 0.0002]
+
+Step 2:
+log_volume: [0.0215, 0.9785]
+daily_weighted_sentiment: [0.0331, 0.9669]

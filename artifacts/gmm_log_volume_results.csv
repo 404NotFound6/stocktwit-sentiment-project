@@ -1,0 +1,8 @@
+Dependent Variable,Variable,Coefficient,Std Error,t-value,p-value
+log_volume,Intercept,-0.4128,0.3961,-1.0422,0.2973
+log_volume,log_volume_lag1,0.8847,0.0149,59.3858,0.0
+log_volume,sentiment_score_lag1,-0.0007,0.0074,-0.0987,0.9214
+log_volume,sentiment_score_lag2,-0.0061,0.0073,-0.832,0.4054
+log_volume,sentiment_score_lag3,-0.0077,0.008,-0.9608,0.3367
+log_volume,variation,16.0298,1.4528,11.0337,0.0
+log_volume,log_size,0.0743,0.0164,4.5232,0.0

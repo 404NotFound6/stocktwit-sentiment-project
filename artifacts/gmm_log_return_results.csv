@@ -1,0 +1,8 @@
+Dependent Variable,Variable,Coefficient,Std Error,t-value,p-value
+log_return,Intercept,-1.9315,0.8548,-2.2597,0.0238
+log_return,log_return_lag1,-0.0367,0.0266,-1.3829,0.1667
+log_return,sentiment_score_lag1,-0.0053,0.0191,-0.2781,0.781
+log_return,sentiment_score_lag2,0.0164,0.0187,0.8783,0.3798
+log_return,sentiment_score_lag3,-0.0472,0.0189,-2.4988,0.0125
+log_return,variation,37.3647,3.4888,10.7098,0.0
+log_return,log_size,0.0568,0.0323,1.7563,0.079

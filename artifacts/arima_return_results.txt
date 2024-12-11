@@ -1,0 +1,24 @@
+                               SARIMAX Results                                
+==============================================================================
+Dep. Variable:             log_return   No. Observations:                   48
+Model:                          ARIMA   Log Likelihood                 -67.770
+Date:                Wed, 11 Dec 2024   AIC                            141.539
+Time:                        13:39:12   BIC                            147.153
+Sample:                             0   HQIC                           143.660
+                                 - 48                                         
+Covariance Type:                  opg                                         
+=================================================================================================
+                                    coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------------------
+const                            -0.4215      0.309     -1.365      0.172      -1.027       0.184
+daily_weighted_sentiment_lag1    -0.6109      0.333     -1.832      0.067      -1.265       0.043
+sigma2                            0.9860      0.271      3.638      0.000       0.455       1.517
+===================================================================================
+Ljung-Box (L1) (Q):                   0.36   Jarque-Bera (JB):                 2.27
+Prob(Q):                              0.55   Prob(JB):                         0.32
+Heteroskedasticity (H):               0.71   Skew:                            -0.45
+Prob(H) (two-sided):                  0.50   Kurtosis:                         2.43
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).

@@ -1,0 +1,4 @@
+Variable,Coefficient,Std Error,t-value,p-value
+const,-0.4215,0.3087,-1.3651,0.1722
+daily_weighted_sentiment_lag1,-0.6109,0.3335,-1.8321,0.0669
+sigma2,0.986,0.2711,3.6375,0.0003
