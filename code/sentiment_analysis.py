@@ -13,12 +13,15 @@ from datastorage import save_sentiment
 from datastorage import get_all_sentiments
 
 def write_csv(data, path):
+    """Write the DataFrame data to a CSV file."""
     data.to_csv(path, mode="w+", index=False, encoding="utf-8")
 
 def write_excel(data, path, sheet_name="Sheet1"):
+    """Write the DataFrame data to an Excel file."""
     data.to_excel(path, sheet_name=sheet_name, index=False)
 
 def comments_analysis(all_comments):
+    """Analyze all comments and save the results."""
     data_sorted = all_comments.sort_values(by=["stock", "comment_time"]).reset_index(drop=True)
     stock_comment_counts = data_sorted.groupby("stock").size().reset_index(name="total_comments")
     tenth_comment_time = (
@@ -35,6 +38,7 @@ def comments_analysis(all_comments):
     write_csv(result, path=OUTPUT_DIR1)
 
 def sentiment_analysis(all_comments):
+    """Perform text sentiment analysis and save the results."""
     pipe = pipeline(
         "text-classification",
         model="cardiffnlp/twitter-roberta-base-sentiment-latest",
@@ -60,6 +64,7 @@ def sentiment_analysis(all_comments):
     save_sentiment(all_comments, session)
 
 def check_accuracy(all_sentiments):
+    """Evaluate the accuracy of the sentiment analysis model."""
     label_mapping = {"Bullish": "positive", "Bearish": "negative"}
     all_sentiments["mapped_sentiment_tag"] = all_sentiments["sentiment_tag"].map(label_mapping)
     labeled_data = all_sentiments.dropna(subset=["mapped_sentiment_tag", "sentiment"])
@@ -97,6 +102,7 @@ def check_accuracy(all_sentiments):
     plt.savefig(OUTPUT_DIR3)
 
 def get_sentiment_score(all_sentiments):
+    """Calculate and return the sentiment score."""
     if not np.issubdtype(all_sentiments['comment_time'].dtype, np.datetime64):
         all_sentiments['comment_time'] = pd.to_datetime(all_sentiments['comment_time'])
     all_sentiments['date'] = all_sentiments['comment_time'].dt.date

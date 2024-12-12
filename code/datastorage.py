@@ -21,6 +21,7 @@ class Comment(Base):
     influence = Column(Integer)
 
 def save_to_database(data, session):
+    """Save data to the 'comments' table in the database."""
     for _, row in data.iterrows():
         comment = Comment(
             stock=row["stock"],
@@ -34,6 +35,7 @@ def save_to_database(data, session):
     print("Data successfully saved to database.")
 
 def get_all_comments(session):
+    """Retrieve all comments data from the database."""
     query = session.query(Comment)
     data = pd.DataFrame([{
         "stock": row.stock,
@@ -59,6 +61,7 @@ class SentimentAnalysis(Base):
     score = Column(Float)
 
 def save_sentiment(data, session):
+    """Save sentiment analysis results to the 'sentiment_score' table in the database."""
     for _, row in data.iterrows():
         sentiment_entry = SentimentAnalysis(
             stock=row["stock"],
@@ -74,6 +77,7 @@ def save_sentiment(data, session):
     print("Data successfully saved to database.")
 
 def get_all_sentiments(session):
+    """Retrieve all sentiment analysis results from the database."""
     query = session.query(SentimentAnalysis)
     data = pd.DataFrame([{
         "stock": row.stock,
