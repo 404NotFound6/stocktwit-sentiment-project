@@ -14,24 +14,30 @@
 
 ## Introduction
 
-The goal of this project is to analyze how public sentiments could potentially affect the Dow Jones Index and the prices of Companies in the Index. The public sentiments were acquired from the comments of an open online forum, Stocktwit. By performing a time-series regression analysis, we could have a better understanding of how sentiments score from StockTwits predict future stock movements. 
+The goal of this project is to analyze how public sentiments potentially affect the Dow Jones Index (DJI) and the stock prices of companies within the index. Public sentiment data was gathered from comments on an open online forum, StockTwits. By performing time-series regression analysis, we aim to better understand how sentiment scores derived from StockTwits can predict future stock movements.
 
 
 ## Methodology
 
-We scraped the comments and the number of comments that are under each comment of 30 companies in the Dow Jones Index from the forum Stocktwit using Python packaging selenium. Since the total number of data is huge, We then connected to the Google Cloud Platform(GCP) to acquire servers to help with scraping. After scraping, we add these posts to the SQL database and use SQLAlchemy to derive sentiment scores in the (GPT model) (need to switch). 
+We scraped comments and their respective metadata (such as the number of likes and shares) for 30 companies in the Dow Jones Index from the StockTwits forum using Python's Selenium package. Due to the large volume of data, we leveraged Google Cloud Platform (GCP) servers to assist with the scraping process. After collecting the data, we stored the posts in a SQL database and used SQLAlchemy for sentiment analysis.
 
-1. Stocktwit Comments: We acquired 85775 posts from these 30 companies. Based on the date that the program stopped, the number of comments on each company is not the same, and the last date of the comment scarped for each company is not the same as well. The output of all the comments was directly pushed to the database. The summary of the number of comments and the last date of the comment scraped is provided below and also in the artifact folder.
+1. Stocktwit Comments: We collected 85,775 posts from the 30 companies in the Dow Jones Index. The number of comments per company varied, and the final comment dates scraped for each company were inconsistent due to the stopping points of the scraping process. All comments were directly pushed to the database. A detailed summary of the number of comments and the final comment dates is provided below and in the artifact folder.
 
-2. Sentiment Scores: After receiving the comments, we performed sentiment analysis on them using pre-trained models from the Hugging Face community. Based on Antweiler W and Frank M Z's article "Is All That Talk Just Noise? The Information Content of Internet Stock Message Boards", we added an influence variable calculated based on the number of comments, likes, and shares. This variable was then used to construct a daily investor sentiment index for each stock.
+2. Sentiment Scores: Once the comments were collected, we performed sentiment analysis using pre-trained models from the Hugging Face community. Following the methodology of Antweiler and Frank's article "Is All That Talk Just Noise? The Information Content of Internet Stock Message Boards", we incorporated an influence variable calculated based on the number of comments, likes, and shares. This variable was then used to construct a daily investor sentiment index for each stock.
 
-3. Regression: We first employed the MA and VAR models for time series analysis to examine the impact of sentiment scores on Dow Jones Index (DJI)'s return and volume. Then to analyze the sentimetn scores's effect on stocks, we use the dynamic panel model with GMM estimation.
-
-
+3. Regression: We first applied Moving Average (MA) and Vector Autoregression (VAR) models to analyze the impact of sentiment scores on the DJI's return and trading volume. To examine the effects of sentiment scores on individual stock prices, we employed a dynamic panel model with Generalized Method of Moments (GMM) estimation.
 
 ## Step for Reproduce
 
 Install the necessary package with the pip install -r requirement.txt 
+
+For the web scraping code, you can run it directly in the terminal using python code/stocktwit.py. However, we strongly recommend running this code in VMs. Additionally, to ensure the code runs properly on a server, you need to configure tools required for Selenium, such as Chrome and Chrome Driver, on the server.
+
+To store the data, you need to execute the commands in create_tables.sql directly in the Google Cloud Platform SQL database. This will create two tables to store comments and sentiment score data. To query data from the database, you can run the code in queries.sql directly in the Google Cloud Platform SQL database. This allows you to check the total amount of data and the scraping status for each stock.
+
+For the sentiment analysis code, you can run it directly using python code/sentiment_analysis.py. However, to ensure faster execution, it is recommended to configure the PyTorch framework and CUDA in a local virtual environment or a virtual machine (VM). Since GPU acceleration is used in the code, the relevant environment needs to be set up to utilize the GPU.
+
+For data cleaning and regression analysis, you can run the scripts directly using python code/data_clean.py and python code/regression.py. The generated data and outputs will be saved in the artifacts and data folders.
 
 ## Results
 **Comment statistics**
@@ -134,5 +140,8 @@ Generally, the impact of sentiment score on individual stocks shares the same si
 
 ## Limitation
 
+Data: We have limited comments available for each company. Specifically, three companies have only 200 comments each. Scraping all the data was a time-consuming process, as we had to spend considerable effort retrieving comments for each company. Additionally, the comment dates span a relatively short period, which poses challenges for conducting robust time series analysis.
+
+Regression: The results from three out of six regression models were not statistically significant. However, the signs of the coefficients in these models are consistent with those in the three significant models. As a result, this limitation caused less trouble for us compared to the challenges encountered with the data.
 
 
