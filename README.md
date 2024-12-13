@@ -73,8 +73,11 @@ For data cleaning and regression analysis, you can run the scripts directly usin
 </p>
 
 **Regression:** 
-1. Dow Jones Index:
-   Impact of sentiment scores on return:
+Time Series Analysis
+
+The goal of this part is to analyze the relationship between public sentiment and the performance of the Dow Jones Index, focusing on both price returns and trading volume. 
+
+   1. Impact of sentiment scores on return:
 <div align="center">
 
 | Variable | Coefficient | Std Error | t-value |p-value|
@@ -84,9 +87,9 @@ For data cleaning and regression analysis, you can run the scripts directly usin
 | Sigma2 | 104,217.89       | 0.986    | 3.6375      |0.0003|
 </div>
 
-This regression result suggests that the first lag of sentiment scores would negatively affect the log return of Dow Jones Index.
-
-  Impact of sentiment scores on volume:
+ The slightly negative coefficient of “Weighted_Sentiment_Lag1” (β = -0.6109) suggests that higher negative sentiment from the previous period correlates with a decrease in log returns, though the result is statistically significant at the 10% level (p = 0.0669).
+ 
+  2. Impact of sentiment scores on volume:
 <div align="center">
   
   | Variable | Coefficient | Std Error | t-value |p-value|
@@ -96,16 +99,27 @@ This regression result suggests that the first lag of sentiment scores would neg
 | ma.L1	|0.5029	|0.1864|2.6974|	0.007|
 |  ma.L2|	0.3557|	0.2059|	1.7276	|0.0841|
 |  sigma2|	0.0655|	0.0144|	4.5459|	0.0|
-</div>
-This MA(2) regression result suggest that the third lag of sentiment scores also negatively affect the log volume of Dow Jones Index. 
+</div> 
+
+The negative coefficient of “Weighted_Sentiment_Lag3” (β = -0.2741, p = 0.0174) indicates a statistically significant negative relationship between the sentient in lag 3 period with log volume of the DJI.
 
 We also generate the Impulse Response graph to see the how return and volume respond to the change in sentiment scores.
+
+  3. Impulse Response function for log return 
 ![ var return ](./artifacts/var_return_impulse_response_irf.png)
 
+The impulse response function (IRF) graph in the top-right corner illustrates the response of Dow Jones Index log returns to a one-unit shock in daily weighted sentiment over a 10-step horizon. It indicates that a one-unit shock in daily weighted sentiment has a negative impact on log returns, with the effect manifesting over subsequent lags. Although the result is statistically insignificant, it is consistent in sign with our previous regression model, which found that sentiment scores are negatively related to log returns.
+
+  4. Impulse Response function for log volume 
 ![ var return ](./artifacts/var_volume_impulse_response_irf.png)
 
+The impulse response function (IRF) graph in the top-right corner illustrates the response of Dow Jones Index log volumes to a one-unit shock in daily weighted sentiment over a 10-step horizon. It shows that a one-unit shock in daily weighted sentiment has a negative impact on log volumes in lags. Although the result is insignificant, it aligns in sign with our previous regression model.
 
-2. 30 Stocks:
+
+Panel Data Analysis:
+
+We also conducted a panel data analysis to examine the impact of sentiment scores at the individual stock level.
+
 <div align="center">
   
 | Variable | Coefficient | Std Error | t-value |p-value|
@@ -119,7 +133,7 @@ We also generate the Impulse Response graph to see the how return and volume res
 |log_size|	0.0568|	0.0323|	1.7563	|0.079|
 </div>
 
-This regression result suggests that only the third lag of sentiment scores would have negative impact on log return, which is similar to the regression on DJI's return , showing that sentiment scores negatively related to log return both in index level and individual firm level.
+This regression result indicates that only the third lag of sentiment scores has a statistically significant negative impact on log returns. This finding is consistent with the previous regression on the Dow Jones Index (DJI) returns, demonstrating that sentiment scores are negatively related to log returns at both the index level and the individual firm level.
 
 <div align="center">
   
@@ -134,9 +148,10 @@ This regression result suggests that only the third lag of sentiment scores woul
 |log_size|	0.0743|	0.0164	|4.5232|	0.0|
 </div>
 
-This regression results suggests that all the lagd of sentiment scores are not statistically significant, but the coefficients are all negative, which shows the similar negative impact of sentiment score on return from previous regression for DJI.
+This regression result suggests that all lags of sentiment scores are not statistically significant; however, the coefficients are consistently negative. This aligns with the previous regression for the Dow Jones Index (DJI), indicating a similar negative impact of sentiment scores on returns.
 
-Generally, the impact of sentiment score on individual stocks shares the same sign as the impact on Dow Jones Index.
+Overall, the impact of sentiment scores on individual stocks aligns with the observed impact on the Dow Jones Index, consistently sharing the same sign. This suggests that sentiment scores exert a similar directional influence across both the broader market index and individual stock levels. 
+
 
 ## Limitation
 
