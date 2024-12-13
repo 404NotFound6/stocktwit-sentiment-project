@@ -42,9 +42,9 @@ Where M<sub>t</sub> = M<sub>t</sub><sup>pos</sup> + M<sub>t</sub><sup>neg</sup> 
 
 3. Regression: We first applied Moving Average (MA) and Vector Autoregression (VAR) models to analyze the impact of sentiment scores on the DJI's return and trading volume. To examine the effects of sentiment scores on return and volume of individual stock, we employed a dynamic panel model with a Generalized Method of Moments (GMM) estimation.
 
-## Step for Reproduce
+## Steps to Reproduce
 
-Install the necessary package with the pip install -r requirement.txt 
+Install the necessary package with the pip install -r requirements.txt 
 
 For the web scraping code, you can run it directly in the terminal using python code/stocktwit.py. However, we strongly recommend running this code in VMs. Additionally, to ensure the code runs properly on a server, you need to configure tools required for Selenium, such as Chrome and Chrome Driver, on the server.
 
