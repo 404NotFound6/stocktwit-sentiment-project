@@ -16,14 +16,19 @@
 
 The goal of this project is to analyze how public sentiments potentially affect the Dow Jones Index (DJI) and the stock return and volume of companies within the index. Public sentiment data was gathered from comments on an open online forum, StockTwits. By performing time-series regression analysis, we aim to better understand how sentiment scores derived from StockTwits can predict future stock movements.
 
+## Data Source
+
+Comments: StockTwits(https://stocktwits.com/)
+
+Financial data: Yahoo Finance(https://finance.yahoo.com/)
 
 ## Methodology
 
-We scraped comments and their respective metadata (such as the number of likes and shares) for 30 companies in the Dow Jones Index from the StockTwits forum using Python's Selenium package. Due to the large volume of data, we leveraged Google Cloud Platform (GCP) servers to assist with the scraping process. After collecting the data, we stored the posts in an SQL database and used SQLAlchemy to manage the database, and then we used a pre-trained model from the Hugging Face community for sentiment analysis.
+We scraped comments and their respective metadata (such as the number of likes and shares) for 30 companies in the Dow Jones Index from the StockTwits forum using Python's Selenium package. Due to the large volume of data, we leveraged Google Cloud Platform (GCP) servers to assist with the scraping process. After collecting the data, we stored the posts in an SQL database and used SQLAlchemy to manage the database, and then we used a pre-trained model from the Hugging Face community for sentiment analysis (https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest).
 
 1. Stocktwit Comments: We collected 85,775 posts from the 30 companies in the Dow Jones Index. The number of comments per company varied, and the final comment dates scraped for each company were inconsistent due to the stopping points of the scraping process. All comments were directly pushed to the database. A detailed summary of the number of comments and the final comment dates is provided below and in the artifact folder.
 
-2. Sentiment Scores: Once the comments were collected, we performed sentiment analysis using a pre-trained model from the Hugging Face community. Following the methodology of Antweiler and Frank's article "Is All That Talk Just Noise? The Information Content of Internet Stock Message Boards", we incorporated an influence variable calculated based on the number of comments, likes, and shares. This variable was then used to construct a daily investor sentiment index for each stock.
+2. Sentiment Scores: Once the comments were collected, we performed sentiment analysis using a pre-trained model from the Hugging Face community. Following the methodology of Antweiler and Frank's article "Is All That Talk Just Noise? The Information Content of Internet Stock Message Boards", we incorporated an influence variable calculated based on the number of responses, likes, and shares. This variable was then used to construct a daily investor sentiment index for each stock.
 
 <div align="center">
 
