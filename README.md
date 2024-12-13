@@ -14,18 +14,28 @@
 
 ## Introduction
 
-The goal of this project is to analyze how public sentiments potentially affect the Dow Jones Index (DJI) and the stock prices of companies within the index. Public sentiment data was gathered from comments on an open online forum, StockTwits. By performing time-series regression analysis, we aim to better understand how sentiment scores derived from StockTwits can predict future stock movements.
+The goal of this project is to analyze how public sentiments potentially affect the Dow Jones Index (DJI) and the stock return and volume of companies within the index. Public sentiment data was gathered from comments on an open online forum, StockTwits. By performing time-series regression analysis, we aim to better understand how sentiment scores derived from StockTwits can predict future stock movements.
 
 
 ## Methodology
 
-We scraped comments and their respective metadata (such as the number of likes and shares) for 30 companies in the Dow Jones Index from the StockTwits forum using Python's Selenium package. Due to the large volume of data, we leveraged Google Cloud Platform (GCP) servers to assist with the scraping process. After collecting the data, we stored the posts in a SQL database and used SQLAlchemy for sentiment analysis.
+We scraped comments and their respective metadata (such as the number of likes and shares) for 30 companies in the Dow Jones Index from the StockTwits forum using Python's Selenium package. Due to the large volume of data, we leveraged Google Cloud Platform (GCP) servers to assist with the scraping process. After collecting the data, we stored the posts in an SQL database and used SQLAlchemy to manage the database, and then we used a pre-trained model from the Hugging Face community for sentiment analysis.
 
 1. Stocktwit Comments: We collected 85,775 posts from the 30 companies in the Dow Jones Index. The number of comments per company varied, and the final comment dates scraped for each company were inconsistent due to the stopping points of the scraping process. All comments were directly pushed to the database. A detailed summary of the number of comments and the final comment dates is provided below and in the artifact folder.
 
-2. Sentiment Scores: Once the comments were collected, we performed sentiment analysis using pre-trained models from the Hugging Face community. Following the methodology of Antweiler and Frank's article "Is All That Talk Just Noise? The Information Content of Internet Stock Message Boards", we incorporated an influence variable calculated based on the number of comments, likes, and shares. This variable was then used to construct a daily investor sentiment index for each stock.
+2. Sentiment Scores: Once the comments were collected, we performed sentiment analysis using a pre-trained model from the Hugging Face community. Following the methodology of Antweiler and Frank's article "Is All That Talk Just Noise? The Information Content of Internet Stock Message Boards", we incorporated an influence variable calculated based on the number of comments, likes, and shares. This variable was then used to construct a daily investor sentiment index for each stock.
 
-3. Regression: We first applied Moving Average (MA) and Vector Autoregression (VAR) models to analyze the impact of sentiment scores on the DJI's return and trading volume. To examine the effects of sentiment scores on individual stock prices, we employed a dynamic panel model with Generalized Method of Moments (GMM) estimation.
+<div align="center">
+
+B<sub>t</sub> = (M<sub>t</sub><sup>pos</sup> - M<sub>t</sub><sup>neg</sup>) / (M<sub>t</sub><sup>pos</sup> + M<sub>t</sub><sup>neg</sup>)
+
+B<sub>t</sub><sup>Att</sup> = B<sub>t</sub> * ln(1 + M<sub>t</sub>)
+
+Where M<sub>t</sub> = M<sub>t</sub><sup>pos</sup> + M<sub>t</sub><sup>neg</sup> + M<sub>t</sub><sup>neu</sup> , M = ln(1 + influence) + 1
+
+</div>
+
+3. Regression: We first applied Moving Average (MA) and Vector Autoregression (VAR) models to analyze the impact of sentiment scores on the DJI's return and trading volume. To examine the effects of sentiment scores on return and volume of individual stock, we employed a dynamic panel model with a Generalized Method of Moments (GMM) estimation.
 
 ## Step for Reproduce
 
@@ -40,7 +50,9 @@ For the sentiment analysis code, you can run it directly using python code/senti
 For data cleaning and regression analysis, you can run the scripts directly using python code/data_clean.py and python code/regression.py. The generated data and outputs will be saved in the artifacts and data folders.
 
 ## Results
-**Comment statistics**
+
+**Comment statistics:**
+
   This table shows the number of comments for each stock and the earliest comment time.
 <div align="center">
   
@@ -73,6 +85,7 @@ For data cleaning and regression analysis, you can run the scripts directly usin
 </p>
 
 **Regression:** 
+
 Time Series Analysis
 
 The goal of this part is to analyze the relationship between public sentiment and the performance of the Dow Jones Index, focusing on both price returns and trading volume. 
@@ -101,9 +114,9 @@ The goal of this part is to analyze the relationship between public sentiment an
 |  sigma2|	0.0655|	0.0144|	4.5459|	0.0|
 </div> 
 
-The negative coefficient of “Weighted_Sentiment_Lag3” (β = -0.2741, p = 0.0174) indicates a statistically significant negative relationship between the sentient in lag 3 period with log volume of the DJI.
+The negative coefficient of “Weighted_Sentiment_Lag3” (β = -0.2741, p = 0.0174) indicates a statistically significant negative relationship between the sentient in the lag 3 period and with log volume of the DJI.
 
-We also generate the Impulse Response graph to see the how return and volume respond to the change in sentiment scores.
+We also generate the Impulse Response graph to see how return and volume respond to the change in sentiment scores.
 
   3. Impulse Response function for log return 
 ![ var return ](./artifacts/var_return_impulse_response_irf.png)
