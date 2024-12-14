@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
+
 class Comment(Base):
     __tablename__ = "comments"
 
@@ -20,6 +21,7 @@ class Comment(Base):
     sentiment_tag = Column(String(50))
     influence = Column(Integer)
 
+
 def save_to_database(data, session):
     """Save data to the 'comments' table in the database."""
     for _, row in data.iterrows():
@@ -28,25 +30,34 @@ def save_to_database(data, session):
             comment_time=row["comment_time"],
             comments=row["comments"],
             sentiment_tag=row["sentiment_tag"],
-            influence=row["influence"]
+            influence=row["influence"],
         )
         session.add(comment)
     session.commit()
     print("Data successfully saved to database.")
 
+
 def get_all_comments(session):
     """Retrieve all comments data from the database."""
     query = session.query(Comment)
-    data = pd.DataFrame([{
-        "stock": row.stock,
-        "comment_time": row.comment_time,
-        "comments": row.comments,
-        "sentiment_tag": row.sentiment_tag,
-        "influence": row.influence
-    } for row in query])
-    data = data.drop_duplicates(subset=["stock", "comment_time", "comments", "sentiment_tag", "influence"])
+    data = pd.DataFrame(
+        [
+            {
+                "stock": row.stock,
+                "comment_time": row.comment_time,
+                "comments": row.comments,
+                "sentiment_tag": row.sentiment_tag,
+                "influence": row.influence,
+            }
+            for row in query
+        ]
+    )
+    data = data.drop_duplicates(
+        subset=["stock", "comment_time", "comments", "sentiment_tag", "influence"]
+    )
     data = data.reset_index(drop=True)
     return data
+
 
 class SentimentAnalysis(Base):
     __tablename__ = "sentiment_score"
@@ -55,10 +66,11 @@ class SentimentAnalysis(Base):
     stock = Column(String(50))
     comment_time = Column(TIMESTAMP)
     comments = Column(Text)
-    sentiment_tag = Column(String(50)) 
-    influence = Column(Integer)  
+    sentiment_tag = Column(String(50))
+    influence = Column(Integer)
     sentiment = Column(String(50))
     score = Column(Float)
+
 
 def save_sentiment(data, session):
     """Save sentiment analysis results to the 'sentiment_score' table in the database."""
@@ -69,23 +81,29 @@ def save_sentiment(data, session):
             comments=row["comments"],
             sentiment_tag=row["sentiment_tag"],
             influence=row["influence"],
-            sentiment = row["sentiment"],
-            score = row["score"]
+            sentiment=row["sentiment"],
+            score=row["score"],
         )
         session.add(sentiment_entry)
     session.commit()
     print("Data successfully saved to database.")
 
+
 def get_all_sentiments(session):
     """Retrieve all sentiment analysis results from the database."""
     query = session.query(SentimentAnalysis)
-    data = pd.DataFrame([{
-        "stock": row.stock,
-        "comment_time": row.comment_time,
-        "comments": row.comments,
-        "sentiment_tag": row.sentiment_tag,
-        "influence": row.influence,
-        "sentiment": row.sentiment,
-        "score": row.score
-    } for row in query])
+    data = pd.DataFrame(
+        [
+            {
+                "stock": row.stock,
+                "comment_time": row.comment_time,
+                "comments": row.comments,
+                "sentiment_tag": row.sentiment_tag,
+                "influence": row.influence,
+                "sentiment": row.sentiment,
+                "score": row.score,
+            }
+            for row in query
+        ]
+    )
     return data
